@@ -1,28 +1,13 @@
 import React from "react";
 
-function Square({ onClick, squareInfo, onMouseMove, onMouseUp, onMouseDown }) {
-  let { position, isStart, isEnd, isPath, isWall } = squareInfo;
-
-  let background = "";
-  if (isStart) {
-    background = "green";
-  } else if (isEnd) {
-    background = "red";
-  } else if (isPath) {
-    background = "yellow";
-  } else if (isWall) {
-    background = "black";
-  } else {
-    background = "white";
-  }
-
-  let borderTop = "";
-  if (position[0] === 0) {
-    borderTop = `solid 1px black`;
-  } else {
-    borderTop = "none";
-  }
-
+function Square({
+  positionX,
+  onClick,
+  background,
+  onMouseMove,
+  onMouseUp,
+  onMouseDown,
+}) {
   return (
     <div
       onClick={onClick}
@@ -32,10 +17,8 @@ function Square({ onClick, squareInfo, onMouseMove, onMouseUp, onMouseDown }) {
       style={{
         width: 20,
         height: 20,
-        borderTop: borderTop,
-        borderLeft: `solid 1px black`,
-        borderRight: `solid 1px black`,
-        borderBottom: `solid 1px black`,
+        border: `solid 1px black`,
+        borderTop: positionX === 0 ? `solid 1px black` : "0",
         backgroundColor: background,
       }}
     ></div>

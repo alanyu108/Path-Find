@@ -1,10 +1,10 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import Square from "./Square";
 import findPath from "./findPath";
 
 //size of the grid
-const ROWS = 20;
-const COLS = 20;
+const ROWS = 40;
+const COLS = 40;
 
 //generate an empty grid
 const createEmptyGrid = () => {
@@ -22,6 +22,7 @@ const createEmptyGrid = () => {
       });
     }
     grid.push(rows);
+    console.log("yes");
   }
   return grid;
 };
@@ -102,42 +103,96 @@ function App() {
   };
 
   //allows the user to select the start and end nodes
-  const toggleNodes = ({ position }) => {
-    let limit = 0;
-    for (let i = 0; i < ROWS; i++) {
-      for (let j = 0; j < COLS; j++) {
-        if (grid[i][j].isStart || grid[i][j].isEnd) {
-          limit += 1;
+  const toggleNodes = useCallback(
+    ({ position }) => {
+      let limit = 0;
+      for (let i = 0; i < ROWS; i++) {
+        for (let j = 0; j < COLS; j++) {
+          if (grid[i][j].isStart || grid[i][j].isEnd) {
+            limit += 1;
+          }
         }
       }
-    }
 
-    //only a start node and end node are allowed to be created
-    if (limit < 2) {
-      const newGrid = grid.slice();
-      const newSquare = grid[position[0]][position[1]];
-      if (limit === 0) {
-        newSquare.isStart = !newSquare.isStart;
-        newSquare.isCurrent = !newSquare.isCurrent;
-      } else if (limit === 1) {
-        newSquare.isEnd = !newSquare.isEnd;
+      //only a start node and end node are allowed to be created
+      if (limit < 2) {
+        const newGrid = grid.slice();
+        const newSquare = grid[position[0]][position[1]];
+        if (limit === 0) {
+          newSquare.isStart = !newSquare.isStart;
+          newSquare.isCurrent = !newSquare.isCurrent;
+        } else if (limit === 1) {
+          newSquare.isEnd = !newSquare.isEnd;
+        }
+        newGrid[position[0]][position[1]] = newSquare;
+        setGrid(newGrid);
       }
-      newGrid[position[0]][position[1]] = newSquare;
-      setGrid(newGrid);
-    }
-  };
+    },
+    [grid]
+  );
 
   //allows the user to drag click new walls
-  const toggleWalls = ({ position }) => {
-    const newGrid = grid.slice();
-    const newSquare = grid[position[0]][position[1]];
-    if (!grid[position[0]][position[1]].isWall) {
-      console.log(position);
-      newSquare.isWall = true;
-      newGrid[position[0]][position[1]] = newSquare;
-      setGrid(newGrid);
+  const toggleWalls = useCallback(
+    ({ position }) => {
+      const newGrid = grid.slice();
+      const newSquare = grid[position[0]][position[1]];
+      if (!grid[position[0]][position[1]].isWall) {
+        console.log(position);
+        newSquare.isWall = true;
+        newGrid[position[0]][position[1]] = newSquare;
+        setGrid(newGrid);
+      }
+    },
+    [grid]
+  );
+
+  const findColor = useCallback((col) => {
+    let { isStart, isEnd, isPath, isWall } = col;
+    let background = "white";
+    if (isStart) {
+      background = "green";
+    } else if (isEnd) {
+      background = "red";
+    } else if (isPath) {
+      background = "yellow";
+    } else if (isWall) {
+      background = "black";
     }
-  };
+
+    return background;
+  }, []);
+
+  const handleMouseDown = useCallback(() => {
+    if (checkedBoxes.items[1]) {
+      setMouseDown(true);
+    }
+  }, [checkedBoxes.items]);
+
+  const handleMouseUp = useCallback(() => {
+    if (checkedBoxes.items[1]) {
+      setMouseDown(false);
+    }
+  }, [checkedBoxes.items]);
+
+  const handleMouseMove = useCallback(
+    (col) => {
+      if (checkedBoxes.items[1]) {
+        if (mouseDown) {
+          toggleWalls(col);
+        }
+      }
+    },
+    [toggleWalls, mouseDown, checkedBoxes.items]
+  );
+
+  const handleOnClick = useCallback(
+    (col) => {
+      if (checkedBoxes.items[0]) {
+        toggleNodes(col);
+      }
+    },
+    [toggleNodes, checkedBoxes.items]
+  );
 
   return (
     <>
@@ -157,6 +212,11 @@ function App() {
             for (let cols of rows) {
               cols.isWall = false;
               cols.isPath = false;
+              if (cols.isStart) {
+                cols.isCurrent = true;
+              } else {
+                cols.isCurrent = false;
+              }
             }
           }
           setGrid(newGrid);
@@ -199,34 +259,17 @@ function App() {
         {grid.map((rows, i) =>
           rows.map((col, k) => (
             <Square
-              onMouseDown={(event) => {
-                if (checkedBoxes.items[1]) {
-                  setMouseDown(true);
-                }
-              }}
-              onMouseUp={() => {
-                if (checkedBoxes.items[1]) {
-                  setMouseDown(false);
-                }
-              }}
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
               onMouseMove={() => {
-                if (checkedBoxes.items[1]) {
-                  if (mouseDown) {
-                    toggleWalls(col);
-                  }
-                }
+                handleMouseMove(col);
               }}
               onClick={() => {
-                if (checkedBoxes.items[0]) {
-                  toggleNodes(col);
-                }
+                handleOnClick(col);
               }}
               key={`${i}-${k}`}
-              squareInfo={col}
-              checkedBoxes={checkedBoxes}
-              toggleNodes={toggleNodes}
-              toggleWalls={toggleWalls}
-              gridDimensions={[ROWS, COLS]}
+              positionX={i}
+              background={findColor(col)}
             />
           ))
         )}
@@ -236,4 +279,4 @@ function App() {
   );
 }
 
-export default App;
+export default React.memo(App);
