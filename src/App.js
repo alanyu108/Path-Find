@@ -3,8 +3,8 @@ import Square from "./Square";
 import findPath from "./findPath";
 
 //size of the grid
-const ROWS = 40;
-const COLS = 74;
+const ROWS = 20;
+const COLS = 20;
 
 //generate an empty grid
 const createEmptyGrid = () => {
@@ -176,17 +176,19 @@ function App() {
         {runningRef.current ? "Stop Path Finding" : "Start Finding Path"}
       </button>
 
-      {checkedBoxes.items.map((names, i) => (
-        <label key={`${i}`}>
-          <input
-            name={i === 0 ? "nodes" : "walls"}
-            type={"checkbox"}
-            checked={names}
-            onChange={(e) => changeClick(e, i)}
-          />
-          {i === 0 ? "nodes" : "walls"}
-        </label>
-      ))}
+      <span>
+        {checkedBoxes.items.map((names, i) => (
+          <label key={`${i}`}>
+            <input
+              name={i === 0 ? "nodes" : "walls"}
+              type={"checkbox"}
+              checked={names}
+              onChange={(e) => changeClick(e, i)}
+            />
+            {i === 0 ? "nodes" : "walls"}
+          </label>
+        ))}
+      </span>
 
       <div
         style={{
@@ -224,10 +226,12 @@ function App() {
               checkedBoxes={checkedBoxes}
               toggleNodes={toggleNodes}
               toggleWalls={toggleWalls}
+              gridDimensions={[ROWS, COLS]}
             />
           ))
         )}
       </div>
+      <div>yes</div>
     </>
   );
 }
