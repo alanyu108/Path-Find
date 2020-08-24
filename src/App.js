@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
 import Square from "./Square";
-import findPath from "./findPath";
+import findEuclidPath from "./algorithms/euclideanAlgorithm";
 
 //size of the grid
 const ROWS = 40;
@@ -45,7 +45,7 @@ function App() {
   const [mouseDown, setMouseDown] = useState(false);
 
   //allows users to toggle between the nodes and the walls
-  function changeClick(e, i) {
+  const changeClick = (e, i) => {
     if (!runningRef.current) {
       const { checked } = e.target;
       setCheckedBoxes((prevState) => ({
@@ -54,7 +54,7 @@ function App() {
         ),
       }));
     }
-  }
+  };
 
   //animates the path from the start to the end node
   const animatePath = (grid) => {
@@ -80,7 +80,7 @@ function App() {
     //checks if we have a start and an end node
     if (current.length + end.length === 4) {
       //find the next node to move towards
-      let path = findPath(grid);
+      let path = findEuclidPath(grid);
       if (path.length !== 0) {
         //node is then added to the grid and re-rendered
         let newGrid = grid.slice();
