@@ -82,10 +82,9 @@ function App() {
       //find the next node to move towards
       let path = findPath(grid);
       if (path.length !== 0) {
-        grid[current[0]][current[1]].isCurrent = false;
-
         //node is then added to the grid and re-rendered
         let newGrid = grid.slice();
+        newGrid[current[0]][current[1]].isCurrent = false;
         newGrid[path[0]][path[1]].isCurrent = true;
         newGrid[path[0]][path[1]].isPath = true;
         setGrid(newGrid);
