@@ -44,6 +44,7 @@ const findColor = (col) => {
 };
 
 function App() {
+  //grids
   const [grid, setGrid] = useState(() => {
     return createEmptyGrid();
   });
@@ -88,17 +89,18 @@ function App() {
       //find the next node to move towards
       let path = findPath(grid);
       if (path.length !== 0) {
-        setGrid((prevState) => {
-          return produce(prevState, (draftState) => {
-            path.forEach((node) => {
-              draftState[node[0]][node[1]].isPath = true;
+        for (let node of path) {
+          setTimeout(() => {
+            setGrid((prevState) => {
+              return produce(prevState, (draftState) => {
+                draftState[node[0]][node[1]].isPath = true;
+              });
             });
-          });
-        });
+          }, 1);
+        }
       }
     } else {
       console.log("end or start node not detected");
-      return;
     }
   };
 

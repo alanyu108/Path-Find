@@ -28,16 +28,14 @@ function findPath(grid) {
 
   let [x1, y1] = current;
   let [x2, y2] = end;
-  // if (x1 === x2 && y1 === y2) {
-  //   return;
-  // }
 
   while (euclideanDistace(x1, y1, x2, y2) !== 0) {
     //checks the nesw directions to find the node with the shortest distance
-    operations.forEach(([x, y]) => {
-      let newX = x + x1;
-      let newY = y + y1;
 
+    for (let i = 0; i < operations.length; i++) {
+      let [newX, newY] = operations[i];
+      newX += x1;
+      newY += y1;
       if (
         newX >= 0 && //makes sure the new values is within bounds of the grid
         newX < grid.length &&
@@ -51,7 +49,7 @@ function findPath(grid) {
           currentPoint = [newX, newY];
         }
       }
-    });
+    }
     x1 = currentPoint[0];
     y1 = currentPoint[1];
     path.push(currentPoint);
