@@ -6,6 +6,7 @@ function findPath(grid) {
   let maxDistance = 1000;
   let current, end;
   let currentPoint;
+  let path = [];
   let operations = [
     [0, 1],
     [1, 0],
@@ -27,32 +28,36 @@ function findPath(grid) {
 
   let [x1, y1] = current;
   let [x2, y2] = end;
-  if (x1 === x2 && y1 === y2) {
-    return;
-  }
-  //checks the nesw directions to find the node with the shortest distance
-  operations.forEach(([x, y]) => {
-    let newX = x + x1;
-    let newY = y + y1;
+  // if (x1 === x2 && y1 === y2) {
+  //   return;
+  // }
 
-    if (
-      newX >= 0 && //makes sure the new values is within bounds of the grid
-      newX < grid.length &&
-      newY >= 0 &&
-      newY < grid[0].length &&
-      !grid[newX][newY].isWall
-    ) {
-      let currentDistance = euclideanDistace(newX, newY, x2, y2);
-      if (currentDistance < maxDistance) {
-        maxDistance = currentDistance;
-        currentPoint = [newX, newY];
+  while (euclideanDistace(x1, y1, x2, y2) !== 0) {
+    //checks the nesw directions to find the node with the shortest distance
+    operations.forEach(([x, y]) => {
+      let newX = x + x1;
+      let newY = y + y1;
+
+      if (
+        newX >= 0 && //makes sure the new values is within bounds of the grid
+        newX < grid.length &&
+        newY >= 0 &&
+        newY < grid[0].length &&
+        !grid[newX][newY].isWall
+      ) {
+        let currentDistance = euclideanDistace(newX, newY, x2, y2);
+        if (currentDistance < maxDistance) {
+          maxDistance = currentDistance;
+          currentPoint = [newX, newY];
+        }
       }
-    }
-  });
-  x1 = currentPoint[0];
-  y1 = currentPoint[1];
+    });
+    x1 = currentPoint[0];
+    y1 = currentPoint[1];
+    path.push(currentPoint);
+  }
 
-  return currentPoint;
+  return path;
 }
 
 export default findPath;

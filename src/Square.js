@@ -1,6 +1,7 @@
 import React from "react";
 
 function Square({
+  positionY,
   positionX,
   onClick,
   background,
@@ -10,10 +11,14 @@ function Square({
 }) {
   return (
     <div
-      onClick={onClick}
+      onClick={() => {
+        onClick([positionX, positionY]);
+      }}
       onMouseUp={onMouseUp}
       onMouseDown={onMouseDown}
-      onMouseMove={onMouseMove}
+      onMouseMove={() => {
+        onMouseMove([positionX, positionY]);
+      }}
       style={{
         width: 20,
         height: 20,
