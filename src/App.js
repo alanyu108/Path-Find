@@ -3,8 +3,8 @@ import Square from "./Square";
 import findEuclidPath from "./algorithms/euclideanAlgorithm";
 
 //size of the grid
-const ROWS = 40;
-const COLS = 40;
+const ROWS = 20;
+const COLS = 20;
 
 //generate an empty grid
 const createEmptyGrid = () => {
@@ -18,11 +18,9 @@ const createEmptyGrid = () => {
         isEnd: false,
         isPath: false,
         isCurrent: false,
-        isWall: false,
       });
     }
     grid.push(rows);
-    console.log("yes");
   }
   return grid;
 };
@@ -32,29 +30,10 @@ function App() {
     return createEmptyGrid();
   });
 
-  //nodes and walls
-  const [checkedBoxes, setCheckedBoxes] = useState({
-    items: [true, false],
-  });
-
   //starts or ends the path finding algorithm
   const [running, setRunning] = useState(false);
   const runningRef = useRef(running);
   runningRef.current = running;
-
-  const [mouseDown, setMouseDown] = useState(false);
-
-  //allows users to toggle between the nodes and the walls
-  const changeClick = (e, i) => {
-    if (!runningRef.current) {
-      const { checked } = e.target;
-      setCheckedBoxes((prevState) => ({
-        items: prevState.items.map((value, index) =>
-          index === i ? checked : false
-        ),
-      }));
-    }
-  };
 
   //animates the path from the start to the end node
   const animatePath = (grid) => {
@@ -101,9 +80,22 @@ function App() {
     }
   };
 
-  //allows the user to select the start and end nodes
-  const toggleNodes = useCallback(
-    ({ position }) => {
+  const findColor = useCallback((col) => {
+    let { isStart, isEnd, isPath } = col;
+    let background = "white";
+    if (isStart) {
+      background = "green";
+    } else if (isEnd) {
+      background = "red";
+    } else if (isPath) {
+      background = "yellow";
+    }
+
+    return background;
+  }, []);
+
+  const handleOnClick = useCallback(
+    (position) => {
       let limit = 0;
       for (let i = 0; i < ROWS; i++) {
         for (let j = 0; j < COLS; j++) {
@@ -118,79 +110,16 @@ function App() {
         const newGrid = grid.slice();
         const newSquare = grid[position[0]][position[1]];
         if (limit === 0) {
-          newSquare.isStart = !newSquare.isStart;
-          newSquare.isCurrent = !newSquare.isCurrent;
+          newSquare.isStart = true;
+          newSquare.isCurrent = true;
         } else if (limit === 1) {
-          newSquare.isEnd = !newSquare.isEnd;
+          newSquare.isEnd = true;
         }
         newGrid[position[0]][position[1]] = newSquare;
         setGrid(newGrid);
       }
     },
     [grid]
-  );
-
-  //allows the user to drag click new walls
-  const toggleWalls = useCallback(
-    ({ position }) => {
-      const newGrid = grid.slice();
-      const newSquare = grid[position[0]][position[1]];
-      if (!grid[position[0]][position[1]].isWall) {
-        console.log(position);
-        newSquare.isWall = true;
-        newGrid[position[0]][position[1]] = newSquare;
-        setGrid(newGrid);
-      }
-    },
-    [grid]
-  );
-
-  const findColor = useCallback((col) => {
-    let { isStart, isEnd, isPath, isWall } = col;
-    let background = "white";
-    if (isStart) {
-      background = "green";
-    } else if (isEnd) {
-      background = "red";
-    } else if (isPath) {
-      background = "yellow";
-    } else if (isWall) {
-      background = "black";
-    }
-
-    return background;
-  }, []);
-
-  const handleMouseDown = useCallback(() => {
-    if (checkedBoxes.items[1]) {
-      setMouseDown(true);
-    }
-  }, [checkedBoxes.items]);
-
-  const handleMouseUp = useCallback(() => {
-    if (checkedBoxes.items[1]) {
-      setMouseDown(false);
-    }
-  }, [checkedBoxes.items]);
-
-  const handleMouseMove = useCallback(
-    (col) => {
-      if (checkedBoxes.items[1]) {
-        if (mouseDown) {
-          toggleWalls(col);
-        }
-      }
-    },
-    [toggleWalls, mouseDown, checkedBoxes.items]
-  );
-
-  const handleOnClick = useCallback(
-    (col) => {
-      if (checkedBoxes.items[0]) {
-        toggleNodes(col);
-      }
-    },
-    [toggleNodes, checkedBoxes.items]
   );
 
   return (
@@ -203,26 +132,7 @@ function App() {
       >
         Clear
       </button>
-      <button
-        onClick={() => {
-          setRunning(false);
-          let newGrid = grid.slice();
-          for (let rows of newGrid) {
-            for (let cols of rows) {
-              cols.isWall = false;
-              cols.isPath = false;
-              if (cols.isStart) {
-                cols.isCurrent = true;
-              } else {
-                cols.isCurrent = false;
-              }
-            }
-          }
-          setGrid(newGrid);
-        }}
-      >
-        Clear Walls and Path
-      </button>
+
       <button
         onClick={() => {
           setRunning(!running);
@@ -235,20 +145,6 @@ function App() {
         {runningRef.current ? "Stop Path Finding" : "Start Finding Path"}
       </button>
 
-      <span>
-        {checkedBoxes.items.map((names, i) => (
-          <label key={`${i}`}>
-            <input
-              name={i === 0 ? "nodes" : "walls"}
-              type={"checkbox"}
-              checked={names}
-              onChange={(e) => changeClick(e, i)}
-            />
-            {i === 0 ? "nodes" : "walls"}
-          </label>
-        ))}
-      </span>
-
       <div
         style={{
           display: "grid",
@@ -258,16 +154,10 @@ function App() {
         {grid.map((rows, i) =>
           rows.map((col, k) => (
             <Square
-              onMouseDown={handleMouseDown}
-              onMouseUp={handleMouseUp}
-              onMouseMove={() => {
-                handleMouseMove(col);
-              }}
-              onClick={() => {
-                handleOnClick(col);
-              }}
+              onClick={handleOnClick}
               key={`${i}-${k}`}
               positionX={i}
+              positionY={k}
               background={findColor(col)}
             />
           ))

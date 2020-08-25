@@ -2,7 +2,7 @@ const euclideanDistace = (x1, y1, x2, y2) => {
   return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 };
 
-function findEuclidPath(grid) {
+const findEuclidPath = (grid) => {
   let maxDistance = 1000;
   let current, end;
   let currentPoint;
@@ -39,8 +39,7 @@ function findEuclidPath(grid) {
       newX >= 0 && //makes sure the new values is within bounds of the grid
       newX < grid.length &&
       newY >= 0 &&
-      newY < grid[0].length &&
-      !grid[newX][newY].isWall
+      newY < grid[0].length
     ) {
       let currentDistance = euclideanDistace(newX, newY, x2, y2);
       if (currentDistance < maxDistance) {
@@ -53,6 +52,6 @@ function findEuclidPath(grid) {
   y1 = currentPoint[1];
 
   return currentPoint;
-}
+};
 
 export default findEuclidPath;
