@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import aStarPath from "./algorithms/a_star_algorithm";
 
 const ROWS = 50;
@@ -11,6 +11,8 @@ const createEmptyGrid = () => {
     let rows = [];
     for (let j = 0; j < COLS; j++) {
       rows.push({
+        inOpenSet: false,
+        inClosedSet: false,
         position: [i, j],
         isStart: false,
         isEnd: false,
@@ -37,6 +39,11 @@ function AStar() {
     items: [true, false],
   });
 
+  //starts or ends the path finding algorithm
+  const [running, setRunning] = useState(false);
+  const runningRef = useRef(running);
+  runningRef.current = running;
+
   const [mouseDown, setMouseDown] = useState(false);
 
   //allows users to toggle between the nodes and the walls
@@ -50,7 +57,7 @@ function AStar() {
   };
 
   const findColor = useCallback((col) => {
-    let { isStart, isEnd, isPath, isWall } = col;
+    let { isStart, isEnd, isPath, isWall, inClosedSet, inOpenSet } = col;
     let background = "white";
     if (isStart) {
       background = "green";
@@ -60,6 +67,10 @@ function AStar() {
       background = "yellow";
     } else if (isWall) {
       background = "black";
+    } else if (inOpenSet) {
+      background = "blue";
+    } else if (inClosedSet) {
+      background = "orange";
     }
 
     return background;
@@ -83,11 +94,13 @@ function AStar() {
         if (mouseDown) {
           const newGrid = grid.slice();
           const newSquare = newGrid[position[0]][position[1]];
-          if (!grid[position[0]][position[1]].isWall) {
+          if (!newGrid[position[0]][position[1]].isWall) {
             newSquare.isWall = true;
             newSquare.isEnd = false;
             newSquare.isStart = false;
             newSquare.isPath = false;
+            newSquare.inOpenSet = false;
+            newSquare.inClosedSet = false;
             setGrid(newGrid);
           }
         }
@@ -98,11 +111,12 @@ function AStar() {
 
   const handleOnClick = useCallback(
     ({ position }) => {
+      const newGrid = grid.slice();
       if (checkedBoxes.items[0]) {
         let limit = 0;
         for (let i = 0; i < ROWS; i++) {
           for (let j = 0; j < COLS; j++) {
-            if (grid[i][j].isStart || grid[i][j].isEnd) {
+            if (newGrid[i][j].isStart || newGrid[i][j].isEnd) {
               limit += 1;
             }
           }
@@ -110,14 +124,13 @@ function AStar() {
 
         //only a start node and end node are allowed to be created
         if (limit < 2) {
-          const newGrid = grid.slice();
-          const newSquare = grid[position[0]][position[1]];
+          const newSquare = newGrid[position[0]][position[1]];
           if (limit === 0) {
             newSquare.isStart = true;
           } else if (limit === 1) {
             newSquare.isEnd = true;
           }
-          newGrid[position[0]][position[1]] = newSquare;
+
           setGrid(newGrid);
         }
       }
@@ -125,21 +138,113 @@ function AStar() {
     [grid, checkedBoxes.items]
   );
 
+  const animatePath = useCallback(
+    (path) => {
+      let newGrid = grid.slice();
+
+      if (!runningRef.current) {
+        setRunning(false);
+        return;
+      }
+
+      if (path.length === 0) {
+        setRunning(false);
+        for (let rows of newGrid) {
+          for (let cols of rows) {
+            cols.inClosedSet = false;
+            cols.inOpenSet = false;
+          }
+        }
+        setGrid(newGrid);
+        return;
+      }
+
+      let firstNode = path.pop();
+      newGrid[firstNode.position[0]][firstNode.position[1]].isPath = true;
+      setGrid(newGrid);
+
+      requestAnimationFrame(() => {
+        animatePath(path);
+      });
+    },
+    [grid]
+  );
+
+  const drawClosedandOpenSet = useCallback(
+    (grid, openSet, closedSet, path) => {
+      let newGrid = grid.slice();
+
+      if (!runningRef.current) {
+        setRunning(false);
+        return;
+      }
+
+      if (path.length !== 0 || openSet.length === 0) {
+        animatePath(path);
+        return;
+      }
+
+      for (let rows of newGrid) {
+        for (let cols of rows) {
+          cols.isPath = false;
+          if (cols.inOpenSet) {
+            openSet.push(cols);
+          } else if (cols.inClosedSet) {
+            closedSet.push(cols);
+          }
+        }
+      }
+
+      let a_star_obj = aStarPath(newGrid, openSet, closedSet);
+      openSet = a_star_obj.openSet;
+      closedSet = a_star_obj.closedSet;
+
+      for (let node of openSet) {
+        let newPath = node.position;
+        if (!newPath.inOpenSet) {
+          newGrid[newPath[0]][newPath[1]].inOpenSet = true;
+        }
+      }
+      for (let node of closedSet) {
+        let newPath = node.position;
+        if (!newPath.inClosedSet) {
+          newGrid[newPath[0]][newPath[1]].inClosedSet = true;
+        }
+      }
+      setGrid(newGrid);
+
+      requestAnimationFrame(() => {
+        drawClosedandOpenSet(newGrid, openSet, closedSet, a_star_obj.path);
+      });
+    },
+    [animatePath]
+  );
+
   const createPath = useCallback(() => {
-    let path = aStarPath(grid);
+    let openSet = [];
+    let closedSet = [];
+    let start;
+    let path = [];
+
     let newGrid = grid.slice();
-    for (let node of path) {
-      let newPath = node.position;
-      newGrid[newPath[0]][newPath[1]].isPath = true;
+    for (let rows of newGrid) {
+      for (let cols of rows) {
+        if (cols.isStart) {
+          start = cols;
+        }
+      }
     }
-    setGrid(newGrid);
-  }, [grid]);
+    start.inOpenSet = true;
+    openSet.push(start);
+
+    drawClosedandOpenSet(newGrid, openSet, closedSet, path);
+  }, [grid, drawClosedandOpenSet]);
 
   return (
     <>
       <button
         onClick={() => {
-          //setRunning(false);
+          setRunning(false);
           setGrid(createEmptyGrid());
         }}
       >
@@ -147,7 +252,7 @@ function AStar() {
       </button>
       <button
         onClick={() => {
-          //setRunning(false);
+          setRunning(false);
           let newGrid = createEmptyGrid();
           for (let rows of newGrid) {
             for (let cols of rows) {
@@ -167,11 +272,41 @@ function AStar() {
 
       <button
         onClick={() => {
-          createPath(grid);
+          setRunning(!running);
+          if (!running) {
+            runningRef.current = true;
+            let newGrid = grid.slice();
+            createPath(newGrid);
+          }
         }}
       >
-        Start A Star Algorithm
+        {runningRef.current ? "Stop Path Finding" : "Start Finding Path"}
       </button>
+      {checkedBoxes.items[1] && (
+        <button
+          onClick={() => {
+            let newGrid = createEmptyGrid();
+            setRunning(false);
+            for (let rows of newGrid) {
+              for (let cols of rows) {
+                if (grid[cols.position[0]][cols.position[1]].isStart) {
+                  cols.isStart = true;
+                } else if (grid[cols.position[0]][cols.position[1]].isEnd) {
+                  cols.isEnd = true;
+                } else {
+                  let randomNumber = Math.random();
+                  if (randomNumber >= 0.7) {
+                    cols.isWall = true;
+                  }
+                }
+              }
+            }
+            setGrid(newGrid);
+          }}
+        >
+          Generate Random Walls
+        </button>
+      )}
 
       <span>
         {checkedBoxes.items.map((names, i) => (
