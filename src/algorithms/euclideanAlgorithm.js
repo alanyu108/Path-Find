@@ -2,9 +2,8 @@ const euclideanDistace = (x1, y1, x2, y2) => {
   return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 };
 
-const findEuclidPath = (grid) => {
+const findEuclidPath = (grid, current, end) => {
   let maxDistance = 1000;
-  let current, end;
   let currentPoint;
   let operations = [
     [0, 1],
@@ -12,18 +11,6 @@ const findEuclidPath = (grid) => {
     [-1, 0],
     [0, -1],
   ];
-
-  //checks if there is a start and an end node
-  for (let i = 0; i < grid.length; i++) {
-    for (let j = 0; j < grid[0].length; j++) {
-      let { isCurrent, isEnd, position } = grid[i][j];
-      if (isCurrent) {
-        current = position;
-      } else if (isEnd) {
-        end = position;
-      }
-    }
-  }
 
   let [x1, y1] = current;
   let [x2, y2] = end;

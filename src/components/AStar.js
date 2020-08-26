@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useRef } from "react";
-import aStarPath from "./algorithms/a_star_algorithm";
+import aStarPath from "../algorithms/a_star_algorithm";
 
-const ROWS = 50;
-const COLS = 50;
+const ROWS = 30;
+const COLS = 30;
 
 //generate an empty grid
 const createEmptyGrid = () => {
@@ -223,7 +223,7 @@ function AStar() {
   const createPath = useCallback(() => {
     let openSet = [];
     let closedSet = [];
-    let start;
+    let start, end;
     let path = [];
 
     let newGrid = grid.slice();
@@ -231,13 +231,20 @@ function AStar() {
       for (let cols of rows) {
         if (cols.isStart) {
           start = cols;
+        } else if (cols.isEnd) {
+          end = cols;
         }
       }
     }
-    start.inOpenSet = true;
-    openSet.push(start);
 
-    drawClosedandOpenSet(newGrid, openSet, closedSet, path);
+    if (end && start) {
+      start.inOpenSet = true;
+      openSet.push(start);
+      drawClosedandOpenSet(newGrid, openSet, closedSet, path);
+    } else {
+      setRunning(false);
+      return;
+    }
   }, [grid, drawClosedandOpenSet]);
 
   return (
@@ -336,7 +343,9 @@ function AStar() {
               onMouseUp={handleMouseUp}
               onMouseDown={handleMouseDown}
               onMouseMove={() => {
-                handleMouseMove(col);
+                if (!runningRef.current) {
+                  handleMouseMove(col);
+                }
               }}
               key={`${i}-${k}`}
               style={{
