@@ -168,8 +168,10 @@ function Euclid() {
               style={{
                 width: 20,
                 height: 20,
-                border: `solid 1px black`,
-                borderTop: i === 0 ? `solid 1px black` : "0",
+                borderBottom: i === ROWS - 1 ? `solid 1px black` : "0",
+                borderRight: k === COLS - 1 ? `solid 1px black` : "0",
+                borderTop: `solid 1px black`,
+                borderLeft: `solid 1px black`,
                 backgroundColor: `${findColor(col)}`,
               }}
             ></div>
