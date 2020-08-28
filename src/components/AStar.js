@@ -359,8 +359,6 @@ function AStar() {
           ))
         )}
       </div>
-
-      <div>yes</div>
     </>
   );
 }
