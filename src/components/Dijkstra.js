@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from "react";
-import aStarPath from "../algorithms/a_star_algorithm";
+import aStarPath from "../algorithms/dijkstra_algorithm";
 import "./css/component.css";
 
 const ROWS = 30;
@@ -19,9 +19,7 @@ const createEmptyGrid = () => {
         isEnd: false,
         isPath: false,
         isWall: false,
-        f_score: 0,
-        g_score: 0,
-        h_score: 0,
+        g_score: Infinity,
         prevNode: undefined,
       });
     }
@@ -30,7 +28,7 @@ const createEmptyGrid = () => {
   return grid;
 };
 
-function AStar() {
+function Dijkstra() {
   const [grid, setGrid] = useState(() => {
     return createEmptyGrid();
   });
@@ -240,6 +238,7 @@ function AStar() {
 
     if (end && start) {
       start.inOpenSet = true;
+      start.g_score = 0;
       openSet.push(start);
       drawClosedandOpenSet(newGrid, openSet, closedSet, path);
     } else {
@@ -346,6 +345,7 @@ function AStar() {
               </label>
             ))}
           </div>
+
           <div className={"grid-square"}>
             {grid.map((rows, i) =>
               rows.map((col, k) => (
@@ -378,4 +378,4 @@ function AStar() {
   );
 }
 
-export default AStar;
+export default Dijkstra;

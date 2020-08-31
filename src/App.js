@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import AStar from "./components/AStar";
 import Euclid from "./components/Euclid";
+import Dijkstra from "./components/Dijkstra";
 import "./App.css";
-import { ReactComponent as CarrotIcon } from "./carrot.svg";
+import { ReactComponent as CarrotIcon } from "./img/carrot.svg";
 
 function App(props) {
   const [open, setOpen] = useState(false);
@@ -36,7 +37,7 @@ function App(props) {
     return (
       <div className="select" onClick={onOpen}>
         <span>
-          {select ? select.value : "Select"}{" "}
+          {select ? select.value : "Select"}
           <div id={"icon"}>
             <CarrotIcon />
           </div>
@@ -51,63 +52,23 @@ function App(props) {
   }
   let select1 = [
     { key: "o1", value: "Euclidean Algorithm" },
-    { key: "o2", value: "A* Algorithm" },
+    { key: "o2", value: "Dijkstra's Algorithm" },
+    { key: "o3", value: "A* Algorithm" },
   ];
   let renderComponent = select ? select.value : "Euclidean Algorithm";
   return (
     <>
       <div>
-        Example here:
+        Algorithms here:
         <Select options={select1} />
       </div>
       <div>
         {renderComponent === "Euclidean Algorithm" && <Euclid />}
         {renderComponent === "A* Algorithm" && <AStar />}
+        {renderComponent === "Dijkstra's Algorithm" && <Dijkstra />}
       </div>
     </>
   );
 }
-
-// function App() {
-//   const [euclid, setEuclid] = useState(true);
-//   const [astar, setAStar] = useState(false);
-//   function Dropdown(props) {
-//     const [on, setOn] = useState(false);
-//     return (
-//       <>
-//         <button
-//           onClick={() => {
-//             setOn(!on);
-//           }}
-//         >
-//           Select Algorithm
-//         </button>
-//         {on && <li>{props.children}</li>}
-//       </>
-//     );
-//   }
-//   function DropdownItem(props) {
-//     return <ul onClick={props.click}>{props.children}</ul>;
-//   }
-
-//   const handleItemClickEuclid = () => {
-//     setEuclid(!euclid);
-//   };
-
-//   const handleItemClickAStar = () => {
-//     setAStar(!astar);
-//   };
-
-//   return (
-//     <>
-//       <Dropdown>
-//         <DropdownItem click={handleItemClickEuclid}>Euclid</DropdownItem>
-//         <DropdownItem click={handleItemClickAStar}>AStar</DropdownItem>
-//       </Dropdown>
-//       {euclid && <Euclid />}
-//       {astar && <AStar />}
-//     </>
-//   );
-// }
 
 export default React.memo(App);
