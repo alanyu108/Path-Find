@@ -1,38 +1,72 @@
 import React, { useState } from "react";
 import AStar from "./components/AStar";
 import Euclid from "./components/Euclid";
-import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
-import { Dropdown, DropdownButton } from "react-bootstrap";
+import Dijkstra from "./components/Dijkstra";
+import "./App.css";
+import { ReactComponent as CarrotIcon } from "./img/carrot.svg";
 
-function App() {
-  const [openEuclid, setEuclid] = useState(true);
-  const [openAStar, setAStar] = useState(false);
+function App(props) {
+  const [open, setOpen] = useState(false);
+  const [select, setSelect] = useState(null);
+  function Option(props) {
+    const onSelect = (e) => {
+      e.preventDefault();
+      props.onSelect(props.option);
+    };
+    return (
+      <>
+        <li>
+          <div href="#" onClick={onSelect}>
+            {props.option.value}
+          </div>
+        </li>
+      </>
+    );
+  }
+
+  function Select(props) {
+    const onOpen = () => {
+      setOpen(!open);
+    };
+
+    const onSelect = (option) => {
+      setSelect(option);
+      setOpen(false);
+    };
+
+    return (
+      <div className="select" onClick={onOpen}>
+        <span>
+          {select ? select.value : "Select"}
+          <div id={"icon"}>
+            <CarrotIcon />
+          </div>
+        </span>
+        <ul className={open ? "show" : "hide"}>
+          {props.options.map((o) => (
+            <Option key={o.key} option={o} onSelect={onSelect} />
+          ))}
+        </ul>
+      </div>
+    );
+  }
+  let select1 = [
+    { key: "o1", value: "Euclidean Algorithm" },
+    { key: "o2", value: "Dijkstra's Algorithm" },
+    { key: "o3", value: "A* Algorithm" },
+  ];
+  let renderComponent = select ? select.value : "Euclidean Algorithm";
   return (
     <>
-      <DropdownButton id="dropdown-basic-button" title="Select Algorithm">
-        <Dropdown.Item
-          as="button"
-          onClick={() => {
-            setEuclid(true);
-            setAStar(false);
-          }}
-        >
-          Euclidean Algorithm
-        </Dropdown.Item>
-        <Dropdown.Divider />
-        <Dropdown.Item
-          as="button"
-          onClick={() => {
-            setAStar(true);
-            setEuclid(false);
-          }}
-        >
-          A* Algorithm
-        </Dropdown.Item>
-      </DropdownButton>
-
-      {openEuclid && <Euclid />}
-      {openAStar && <AStar />}
+      <div>
+        Algorithms here:
+        <Select options={select1} />
+      </div>
+      <div>
+        {renderComponent === "Euclidean Algorithm" && <Euclid />}
+        {renderComponent === "A* Algorithm" && <AStar />}
+        {renderComponent === "Dijkstra's Algorithm" && <Dijkstra />}
+      </div>
     </>
   );
 }

@@ -29,10 +29,10 @@ let operations = [
   [1, 0],
   [-1, 0],
   [0, -1],
-  // [-1, 1],
-  // [1, 1],
-  // [1, -1],
-  // [-1, -1],
+  //   [-1, 1],
+  //   [1, 1],
+  //   [1, -1],
+  //   [-1, -1],
 ];
 
 const aStarPath = (grid, openSet, closedSet) => {
@@ -47,15 +47,15 @@ const aStarPath = (grid, openSet, closedSet) => {
     }
   }
 
-  let low_f = 0;
+  let low_g = 0;
 
   for (let i = 0; i < openSet.length; i++) {
-    if (openSet[i].f_score < openSet[low_f].f_score) {
-      low_f = i;
+    if (openSet[i].g_score < openSet[low_g].g_score) {
+      low_g = i;
     }
   }
 
-  let currentNode = openSet[low_f];
+  let currentNode = openSet[low_g];
 
   if (
     euclideanDistance(
@@ -112,13 +112,6 @@ const aStarPath = (grid, openSet, closedSet) => {
         }
 
         if (betterPath) {
-          neighbor.h_score = euclideanDistance(
-            neighbor.position[0],
-            neighbor.position[1],
-            end.position[0],
-            end.position[1]
-          );
-          neighbor.f_score = neighbor.h_score + neighbor.g_score;
           neighbor.prevNode = currentNode.position;
         }
       }

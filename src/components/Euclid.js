@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from "react";
-import findEuclidPath from "../algorithms/euclideanAlgorithm";
+import findEuclidPath from "../algorithms/euclidean_algorithm";
+import "./css/component.css";
 
 //size of the grid
 const ROWS = 30;
@@ -131,52 +132,83 @@ function Euclid() {
 
   return (
     <>
-      <button
-        onClick={() => {
-          setRunning(false);
-          setGrid(createEmptyGrid());
-        }}
-      >
-        Clear
-      </button>
-
-      <button
-        onClick={() => {
-          setRunning(!running);
-          if (!running) {
-            runningRef.current = true;
-            animatePath();
-          }
-        }}
-      >
-        {runningRef.current ? "Stop Path Finding" : "Start Finding Path"}
-      </button>
-
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${COLS}, 20px)`,
-        }}
-      >
-        {grid.map((rows, i) =>
-          rows.map((col, k) => (
-            <div
-              key={`${i}-${k}`}
+      <div className={"display"}>
+        <div className={"text"}>
+          <div className={"paragragh-1"}>
+            Lorem Ipsum is simply dummy text of the printing and typesetting
+            industry. Lorem Ipsum has been the industry's standard dummy text
+            ever since the 1500s, when an unknown printer took a galley of type
+            and scrambled it to make a type specimen book. It has survived not
+            only five centuries, but also the leap into electronic typesetting,
+            remaining essentially unchanged. It was popularised in the 1960s
+            with the release of Letraset sheets containing Lorem Ipsum passages,
+            and more recently with desktop publishing software like Aldus
+            PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply
+            dummy text of the printing and typesetting industry. Lorem Ipsum has
+            been the industry's standard dummy text ever since the 1500s, when
+            an unknown printer took a galley of type and scrambled it to make a
+            type specimen book. It has survived not only five centuries, but
+            also the leap into electronic typesetting, remaining essentially
+            unchanged. It was popularised in the 1960s with the release of
+            Letraset sheets containing Lorem Ipsum passages, and more recently
+            with desktop publishing software like Aldus PageMaker including
+            versions of Lorem Ipsum.
+          </div>
+          {/* mathjax */}
+          <div className={"paragragh-2"}>
+            Lorem Ipsum is simply dummy text of the printing and typesetting
+            industry. Lorem Ipsum has been the industry's standard dummy text
+            ever since the 1500s, when an unknown printer took a galley of type
+            and scrambled it to make a type specimen book. It has survived not
+            only five centuries, but also the leap into electronic typesetting,
+            remaining essentially unchanged. It was popularised in the 1960s
+            with the release of Letraset sheets containing Lorem Ipsum passages,
+            and more recently with desktop publishing software like Aldus
+            PageMaker including versions of Lorem Ipsum.
+          </div>
+        </div>
+        <div className={"grid"}>
+          <div className={"grid-button"}>
+            <button
               onClick={() => {
-                handleOnClick([i, k]);
+                setRunning(false);
+                setGrid(createEmptyGrid());
               }}
-              style={{
-                width: 20,
-                height: 20,
-                borderBottom: i === ROWS - 1 ? `solid 1px black` : "0",
-                borderRight: k === COLS - 1 ? `solid 1px black` : "0",
-                borderTop: `solid 1px black`,
-                borderLeft: `solid 1px black`,
-                backgroundColor: `${findColor(col)}`,
+            >
+              Clear
+            </button>
+            <button
+              onClick={() => {
+                setRunning(!running);
+                if (!running) {
+                  runningRef.current = true;
+                  animatePath();
+                }
               }}
-            ></div>
-          ))
-        )}
+            >
+              {runningRef.current ? "Stop Path Finding" : "Start Finding Path"}
+            </button>
+          </div>
+          <div className={"grid-square"}>
+            {grid.map((rows, i) =>
+              rows.map((col, k) => (
+                <div
+                  key={`${i}-${k}`}
+                  onClick={() => {
+                    handleOnClick([i, k]);
+                  }}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    border: `solid 1px black`,
+                    borderTop: i === 0 ? `solid 1px black` : "0",
+                    backgroundColor: `${findColor(col)}`,
+                  }}
+                ></div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </>
   );
