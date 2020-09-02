@@ -35,9 +35,10 @@ let operations = [
   // [-1, -1],
 ];
 
-const aStarPath = (grid, openSet, closedSet) => {
+const graphPath = (grid, openSet, closedSet, algorithm) => {
   let end;
   let path = [];
+  let currentNode = [];
 
   for (let rows of grid) {
     for (let cols of rows) {
@@ -47,15 +48,27 @@ const aStarPath = (grid, openSet, closedSet) => {
     }
   }
 
-  let low_f = 0;
+  if (algorithm === "A* Algorithm") {
+    let low_f = 0;
 
-  for (let i = 0; i < openSet.length; i++) {
-    if (openSet[i].f_score < openSet[low_f].f_score) {
-      low_f = i;
+    for (let i = 0; i < openSet.length; i++) {
+      if (openSet[i].f_score < openSet[low_f].f_score) {
+        low_f = i;
+      }
     }
-  }
 
-  let currentNode = openSet[low_f];
+    currentNode = openSet[low_f];
+  } else if (algorithm === "Dijkstra's Algorithm") {
+    let low_g = 0;
+
+    for (let i = 0; i < openSet.length; i++) {
+      if (openSet[i].g_score < openSet[low_g].g_score) {
+        low_g = i;
+      }
+    }
+
+    currentNode = openSet[low_g];
+  }
 
   if (
     euclideanDistance(
@@ -112,14 +125,18 @@ const aStarPath = (grid, openSet, closedSet) => {
         }
 
         if (betterPath) {
-          neighbor.h_score = euclideanDistance(
-            neighbor.position[0],
-            neighbor.position[1],
-            end.position[0],
-            end.position[1]
-          );
-          neighbor.f_score = neighbor.h_score + neighbor.g_score;
-          neighbor.prevNode = currentNode.position;
+          if (algorithm === "A* Algorithm") {
+            neighbor.h_score = euclideanDistance(
+              neighbor.position[0],
+              neighbor.position[1],
+              end.position[0],
+              end.position[1]
+            );
+            neighbor.f_score = neighbor.h_score + neighbor.g_score;
+            neighbor.prevNode = currentNode.position;
+          } else if (algorithm === "Dijkstra's Algorithm") {
+            neighbor.prevNode = currentNode.position;
+          }
         }
       }
     }
@@ -128,4 +145,4 @@ const aStarPath = (grid, openSet, closedSet) => {
   return { closedSet: closedSet, openSet: openSet, path: path };
 };
 
-export default aStarPath;
+export default graphPath;

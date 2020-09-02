@@ -1,141 +1,21 @@
-import React, { useState, useCallback, useRef } from "react";
-import aStarPath from "../algorithms/dijkstra_algorithm";
-import "./css/component.css";
+import React, { useCallback, useRef, useContext } from "react";
+import { GridContext } from "../GridContext.js";
+import Select from "../Select";
+import graphPath from "../algorithms/graph_based_algorithm";
 
-const ROWS = 30;
-const COLS = 30;
-
-//generate an empty grid
-const createEmptyGrid = () => {
-  let grid = [];
-  for (let i = 0; i < ROWS; i++) {
-    let rows = [];
-    for (let j = 0; j < COLS; j++) {
-      rows.push({
-        inOpenSet: false,
-        inClosedSet: false,
-        position: [i, j],
-        isStart: false,
-        isEnd: false,
-        isPath: false,
-        isWall: false,
-        g_score: Infinity,
-        prevNode: undefined,
-      });
-    }
-    grid.push(rows);
-  }
-  return grid;
-};
-
-function Dijkstra() {
-  const [grid, setGrid] = useState(() => {
-    return createEmptyGrid();
-  });
-
-  //nodes and walls
-  const [checkedBoxes, setCheckedBoxes] = useState({
-    items: [true, false],
-  });
+function Graph(props) {
+  const { gridValue, resetFunction, algorithmValue, runningValue } = useContext(
+    GridContext
+  );
+  const [grid, setGrid] = gridValue;
+  const [algorithm] = algorithmValue;
+  const [createEmptyGrid] = resetFunction;
+  const [running, setRunning] = runningValue;
 
   //starts or ends the path finding algorithm
-  const [running, setRunning] = useState(false);
+
   const runningRef = useRef(running);
   runningRef.current = running;
-
-  const [mouseDown, setMouseDown] = useState(false);
-
-  //allows users to toggle between the nodes and the walls
-  const changeClick = (e, i) => {
-    const { checked } = e.target;
-    setCheckedBoxes((prevState) => ({
-      items: prevState.items.map((value, index) =>
-        index === i ? checked : false
-      ),
-    }));
-  };
-
-  const findColor = useCallback((col) => {
-    let { isStart, isEnd, isPath, isWall, inClosedSet, inOpenSet } = col;
-    let background = "white";
-    if (isStart) {
-      background = "green";
-    } else if (isEnd) {
-      background = "red";
-    } else if (isPath) {
-      background = "yellow";
-    } else if (isWall) {
-      background = "black";
-    } else if (inOpenSet) {
-      background = "blue";
-    } else if (inClosedSet) {
-      background = "orange";
-    }
-
-    return background;
-  }, []);
-
-  const handleMouseDown = useCallback(() => {
-    if (checkedBoxes.items[1]) {
-      setMouseDown(true);
-    }
-  }, [checkedBoxes.items]);
-
-  const handleMouseUp = useCallback(() => {
-    if (checkedBoxes.items[1]) {
-      setMouseDown(false);
-    }
-  }, [checkedBoxes.items]);
-
-  const handleMouseMove = useCallback(
-    ({ position }) => {
-      if (checkedBoxes.items[1]) {
-        if (mouseDown) {
-          const newGrid = grid.slice();
-          const newSquare = newGrid[position[0]][position[1]];
-          if (!newGrid[position[0]][position[1]].isWall) {
-            newSquare.isWall = true;
-            newSquare.isEnd = false;
-            newSquare.isStart = false;
-            newSquare.isPath = false;
-            newSquare.inOpenSet = false;
-            newSquare.inClosedSet = false;
-            setGrid(newGrid);
-          }
-        }
-      }
-    },
-    [grid, mouseDown, checkedBoxes.items]
-  );
-
-  const handleOnClick = useCallback(
-    ({ position }) => {
-      const newGrid = grid.slice();
-      if (checkedBoxes.items[0]) {
-        let limit = 0;
-        for (let i = 0; i < ROWS; i++) {
-          for (let j = 0; j < COLS; j++) {
-            if (newGrid[i][j].isStart || newGrid[i][j].isEnd) {
-              limit += 1;
-            }
-          }
-        }
-
-        //only a start node and end node are allowed to be created
-        if (limit < 2) {
-          const newSquare = newGrid[position[0]][position[1]];
-          if (limit === 0) {
-            newSquare.isStart = true;
-          } else if (limit === 1) {
-            newSquare.isEnd = true;
-          }
-
-          setGrid(newGrid);
-        }
-      }
-    },
-    [grid, checkedBoxes.items]
-  );
 
   const animatePath = useCallback(
     (path) => {
@@ -166,7 +46,7 @@ function Dijkstra() {
         animatePath(path);
       });
     },
-    [grid]
+    [grid, setGrid, setRunning]
   );
 
   const drawClosedandOpenSet = useCallback(
@@ -194,9 +74,10 @@ function Dijkstra() {
         }
       }
 
-      let a_star_obj = aStarPath(newGrid, openSet, closedSet);
-      openSet = a_star_obj.openSet;
-      closedSet = a_star_obj.closedSet;
+      let graph_obj = graphPath(newGrid, openSet, closedSet, algorithm);
+
+      openSet = graph_obj.openSet;
+      closedSet = graph_obj.closedSet;
 
       for (let node of openSet) {
         let newPath = node.position;
@@ -213,10 +94,10 @@ function Dijkstra() {
       setGrid(newGrid);
 
       requestAnimationFrame(() => {
-        drawClosedandOpenSet(newGrid, openSet, closedSet, a_star_obj.path);
+        drawClosedandOpenSet(newGrid, openSet, closedSet, graph_obj.path);
       });
     },
-    [animatePath]
+    [animatePath, setGrid, algorithm, setRunning]
   );
 
   const createPath = useCallback(() => {
@@ -238,14 +119,13 @@ function Dijkstra() {
 
     if (end && start) {
       start.inOpenSet = true;
-      start.g_score = 0;
       openSet.push(start);
       drawClosedandOpenSet(newGrid, openSet, closedSet, path);
     } else {
       setRunning(false);
       return;
     }
-  }, [grid, drawClosedandOpenSet]);
+  }, [grid, drawClosedandOpenSet, setRunning]);
 
   return (
     <>
@@ -286,6 +166,15 @@ function Dijkstra() {
         </div>
 
         <div className={"grid"}>
+          <div>
+            Algorithms here:
+            <Select
+              options={[
+                { key: "o1", value: "Dijkstra's Algorithm" },
+                { key: "o2", value: "A* Algorithm" },
+              ]}
+            />
+          </div>
           <div className={"grid-button"}>
             <button
               onClick={() => {
@@ -332,45 +221,6 @@ function Dijkstra() {
             >
               Generate Random Walls
             </button>
-
-            {checkedBoxes.items.map((names, i) => (
-              <label key={`${i}`}>
-                <input
-                  name={i === 0 ? "nodes" : "walls"}
-                  type={"checkbox"}
-                  checked={names}
-                  onChange={(e) => changeClick(e, i)}
-                />
-                {i === 0 ? "nodes" : "walls"}
-              </label>
-            ))}
-          </div>
-
-          <div className={"grid-square"}>
-            {grid.map((rows, i) =>
-              rows.map((col, k) => (
-                <div
-                  onClick={() => {
-                    handleOnClick(col);
-                  }}
-                  onMouseUp={handleMouseUp}
-                  onMouseDown={handleMouseDown}
-                  onMouseMove={() => {
-                    if (!runningRef.current) {
-                      handleMouseMove(col);
-                    }
-                  }}
-                  key={`${i}-${k}`}
-                  style={{
-                    width: 20,
-                    height: 20,
-                    border: `solid 1px black`,
-                    borderTop: i === 0 ? `solid 1px black` : "0",
-                    backgroundColor: `${findColor(col)}`,
-                  }}
-                ></div>
-              ))
-            )}
           </div>
         </div>
       </div>
@@ -378,4 +228,4 @@ function Dijkstra() {
   );
 }
 
-export default Dijkstra;
+export default Graph;
