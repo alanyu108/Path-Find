@@ -1,11 +1,15 @@
 import React, { useState, useCallback, useContext } from "react";
 import { GridContext } from "../GridContext.js";
+import AStarText from "./AStarText";
+import DijkstraText from "./DijkstraText";
+import Graph from "./Graph";
 
 //displays the grid that the user interacts with
 const Display = () => {
-  const { gridValue, runningValue } = useContext(GridContext);
+  const { gridValue, runningValue, algorithmValue } = useContext(GridContext);
   const [grid, setGrid] = gridValue;
   const [running, setRunning] = runningValue;
+  const [algorithm, setAlgorithm] = algorithmValue;
 
   const [mouseDown, setMouseDown] = useState(false);
 
@@ -91,37 +95,42 @@ const Display = () => {
   );
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: `repeat(${grid.length}, 20px)`,
-      }}
-    >
-      {grid.map((rows, i) =>
-        rows.map((col, k) => (
-          <div
-            onClick={() => {
-              handleOnClick([i, k]);
-            }}
-            onMouseUp={handleMouseUp}
-            onMouseDown={handleMouseDown}
-            onMouseMove={() => {
-              if (!running) {
-                handleMouseMove(col);
-              }
-            }}
-            key={`${i}-${k}`}
-            style={{
-              width: 20,
-              height: 20,
-              border: `solid 1px black`,
-              borderTop: i === 0 ? `solid 1px black` : "0",
-              backgroundColor: `${findColor(col)}`,
-            }}
-          ></div>
-        ))
-      )}
-    </div>
+    <>
+      {algorithm === "A* Algorithm" && <AStarText />}
+      {algorithm === "Dijkstra's Algorithm" && <DijkstraText />}
+      <Graph />
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${grid.length}, 20px)`,
+        }}
+      >
+        {grid.map((rows, i) =>
+          rows.map((col, k) => (
+            <div
+              onClick={() => {
+                handleOnClick([i, k]);
+              }}
+              onMouseUp={handleMouseUp}
+              onMouseDown={handleMouseDown}
+              onMouseMove={() => {
+                if (!running) {
+                  handleMouseMove(col);
+                }
+              }}
+              key={`${i}-${k}`}
+              style={{
+                width: 20,
+                height: 20,
+                border: `solid 1px black`,
+                borderTop: i === 0 ? `solid 1px black` : "0",
+                backgroundColor: `${findColor(col)}`,
+              }}
+            ></div>
+          ))
+        )}
+      </div>
+    </>
   );
 };
 

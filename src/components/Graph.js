@@ -274,4 +274,4 @@ function Graph(props) {
   );
 }
 
-export default Graph;
+export default React.memo(Graph);
