@@ -1,7 +1,8 @@
 import React, { useState, useContext } from "react";
-import { ReactComponent as CarrotIcon } from "./img/carrot.svg";
-import { GridContext } from "./GridContext";
+import { ReactComponent as CarrotIcon } from "../img/carrot.svg";
+import { GridContext } from "../GridContext";
 
+//each option of the dropdown menu
 function Option(props) {
   const onSelect = (e) => {
     e.preventDefault();
@@ -27,10 +28,14 @@ function Select(props) {
   const [createEmptyGrid] = resetFunction;
   const [running, setRunning] = runningValue;
 
+  //toggles the dropdown menu
   const onOpen = () => {
     setOpen(!open);
   };
 
+  //when an option is selected, the grid walls,
+  //start and end node remains
+  //while the rest of the grid is reset
   const onSelect = (option) => {
     setSelect(option);
     setOpen(false);

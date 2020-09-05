@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useContext } from "react";
 import { GridContext } from "../GridContext.js";
-import Select from "../Select";
 import graphPath from "../algorithms/graph_based_algorithm";
+import newMaze from "../algorithms/smaller_maze";
 
 function Graph(props) {
   const { gridValue, resetFunction, algorithmValue, runningValue } = useContext(
@@ -12,11 +12,11 @@ function Graph(props) {
   const [createEmptyGrid] = resetFunction;
   const [running, setRunning] = runningValue;
 
-  //starts or ends the path finding algorithm
-
   const runningRef = useRef(running);
   runningRef.current = running;
 
+  //animates the path recursively if it is found
+  //through the algorithm
   const animatePath = useCallback(
     (path) => {
       let newGrid = grid.slice();
@@ -49,6 +49,10 @@ function Graph(props) {
     [grid, setGrid, setRunning]
   );
 
+  //displays the open and closed sets when the both
+  //A* and Dijkstra's algorithm is running
+  //blue color corresponds to the open set
+  //orange color corresponds to the closed set
   const drawClosedandOpenSet = useCallback(
     (grid, openSet, closedSet, path) => {
       let newGrid = grid.slice();
@@ -74,11 +78,13 @@ function Graph(props) {
         }
       }
 
+      //finds the open and closed set given the pervious closed and open set
       let graph_obj = graphPath(newGrid, openSet, closedSet, algorithm);
 
       openSet = graph_obj.openSet;
       closedSet = graph_obj.closedSet;
 
+      //draws the open and closed sets
       for (let node of openSet) {
         let newPath = node.position;
         if (!newPath.inOpenSet) {
@@ -100,6 +106,9 @@ function Graph(props) {
     [animatePath, setGrid, algorithm, setRunning]
   );
 
+  //start the algorithms depending on
+  //which alogrithm was selected by the user
+  //either A* or Dijkstra
   const createPath = useCallback(() => {
     let openSet = [];
     let closedSet = [];
@@ -117,9 +126,10 @@ function Graph(props) {
       }
     }
 
+    //checks if there is a start and an end node
     if (end && start) {
       start.inOpenSet = true;
-      openSet.push(start);
+      openSet.push(start); //pushes the start node into the open set
       drawClosedandOpenSet(newGrid, openSet, closedSet, path);
     } else {
       setRunning(false);
@@ -130,52 +140,9 @@ function Graph(props) {
   return (
     <>
       <div className={"display"}>
-        <div className={"text"}>
-          <div className={"paragragh-1"}>
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book. It has survived not
-            only five centuries, but also the leap into electronic typesetting,
-            remaining essentially unchanged. It was popularised in the 1960s
-            with the release of Letraset sheets containing Lorem Ipsum passages,
-            and more recently with desktop publishing software like Aldus
-            PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply
-            dummy text of the printing and typesetting industry. Lorem Ipsum has
-            been the industry's standard dummy text ever since the 1500s, when
-            an unknown printer took a galley of type and scrambled it to make a
-            type specimen book. It has survived not only five centuries, but
-            also the leap into electronic typesetting, remaining essentially
-            unchanged. It was popularised in the 1960s with the release of
-            Letraset sheets containing Lorem Ipsum passages, and more recently
-            with desktop publishing software like Aldus PageMaker including
-            versions of Lorem Ipsum.
-          </div>
-          {/* mathjax */}
-          <div className={"paragragh-2"}>
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book. It has survived not
-            only five centuries, but also the leap into electronic typesetting,
-            remaining essentially unchanged. It was popularised in the 1960s
-            with the release of Letraset sheets containing Lorem Ipsum passages,
-            and more recently with desktop publishing software like Aldus
-            PageMaker including versions of Lorem Ipsum.
-          </div>
-        </div>
-
         <div className={"grid"}>
-          <div>
-            Algorithms here:
-            <Select
-              options={[
-                { key: "o1", value: "Dijkstra's Algorithm" },
-                { key: "o2", value: "A* Algorithm" },
-              ]}
-            />
-          </div>
           <div className={"grid-button"}>
+            {/* clears the grid */}
             <button
               onClick={() => {
                 setRunning(false);
@@ -185,6 +152,7 @@ function Graph(props) {
               Clear
             </button>
 
+            {/* starts or stops the algorithm currently running */}
             <button
               onClick={() => {
                 setRunning(!running);
@@ -198,6 +166,7 @@ function Graph(props) {
               {runningRef.current ? "Stop Path Finding" : "Start Finding Path"}
             </button>
 
+            {/* generates random walls if the user is too lazy to drag click the walls */}
             <button
               onClick={() => {
                 let newGrid = createEmptyGrid();
@@ -220,6 +189,83 @@ function Graph(props) {
               }}
             >
               Generate Random Walls
+            </button>
+
+            {/* generates a new maze using a recursive backtracker */}
+            <button
+              onClick={() => {
+                setRunning(false);
+                let newGrid = createEmptyGrid();
+                //returns a list of nodes and where their correspoding walls should be
+                let mazePath = newMaze(newGrid);
+
+                console.log(mazePath);
+                for (let elements of mazePath) {
+                  let [x, y] = elements.position;
+                  for (let i = 0; i < elements.walls.length; i++) {
+                    let walls = elements.walls[i];
+                    if (walls) {
+                      if (i === 0) {
+                        //top
+                        if (x - 1 >= 0) {
+                          newGrid[x - 1][y].isWall = true;
+                        }
+                      }
+                      if (i === 1) {
+                        //right
+                        if (y + 1 < newGrid[0].length) {
+                          newGrid[x][y + 1].isWall = true;
+                        }
+                      }
+                      if (i === 2) {
+                        //bottom
+                        if (x + 1 < grid.length) {
+                          newGrid[x + 1][y].isWall = true;
+                        }
+                      }
+                      if (i === 3) {
+                        //left
+                        if (y - 1 >= 0) {
+                          newGrid[x][y - 1].isWall = true;
+                        }
+                      }
+                    }
+                  }
+                }
+
+                //makes all the diagonals of the even nodes to be walls
+                for (let rows of newGrid) {
+                  for (let cols of rows) {
+                    if (
+                      cols.position[1] % 2 === 0 &&
+                      cols.position[0] % 2 === 0
+                    ) {
+                      let operations = [
+                        [-1, 1],
+                        [1, 1],
+                        [1, -1],
+                        [-1, -1],
+                      ];
+                      for (let transform of operations) {
+                        let [x, y] = transform;
+                        let newX = cols.position[0] + x;
+                        let newY = cols.position[1] + y;
+                        if (
+                          newX >= 0 && //makes sure the new values is within bounds of the grid
+                          newX < grid.length &&
+                          newY >= 0 &&
+                          newY < grid[0].length
+                        ) {
+                          newGrid[newX][newY].isWall = true;
+                        }
+                      }
+                    }
+                  }
+                }
+                setGrid(newGrid);
+              }}
+            >
+              Create maze
             </button>
           </div>
         </div>

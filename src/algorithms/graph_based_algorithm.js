@@ -1,7 +1,9 @@
+//finds the euclidean distance between two nodes
 const euclideanDistance = (x1, y1, x2, y2) => {
   return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 };
 
+//deletes an element from an array
 const deleteFromArray = (openSet, { position }) => {
   return openSet.filter(
     (node) =>
@@ -14,6 +16,7 @@ const deleteFromArray = (openSet, { position }) => {
   );
 };
 
+//checks if a given element is within an array
 const includes = (closedSet, { position }) => {
   for (let nodes of closedSet) {
     let node = nodes.position;
@@ -24,6 +27,7 @@ const includes = (closedSet, { position }) => {
   return false;
 };
 
+//used to find the neighbors of the current node
 let operations = [
   [0, 1],
   [1, 0],
@@ -48,6 +52,8 @@ const graphPath = (grid, openSet, closedSet, algorithm) => {
     }
   }
 
+  //finds the lowest f-score in the open set (A*)
+  //finds the lowest g-score in the open set (Dijkstra)
   if (algorithm === "A* Algorithm") {
     let low_f = 0;
 
@@ -70,6 +76,9 @@ const graphPath = (grid, openSet, closedSet, algorithm) => {
     currentNode = openSet[low_g];
   }
 
+  //checks if the current node is equal to the end node
+  //if it is, we have reached the end and the can backtrack to
+  //find the path from the start node to the end node
   if (
     euclideanDistance(
       currentNode.position[0],
@@ -94,14 +103,16 @@ const graphPath = (grid, openSet, closedSet, algorithm) => {
   currentNode.inClosedSet = true;
   closedSet.unshift(currentNode);
 
+  //loops through all the neighbors of the current node
   for (let neighbors of operations) {
     let [x, y] = neighbors;
     let newX = x + currentNode.position[0];
     let newY = y + currentNode.position[1];
     let betterPath = false;
 
+    //makes sure the new values is within bounds of the grid
     if (
-      newX >= 0 && //makes sure the new values is within bounds of the grid
+      newX >= 0 &&
       newX < grid.length &&
       newY >= 0 &&
       newY < grid[0].length &&
@@ -109,11 +120,16 @@ const graphPath = (grid, openSet, closedSet, algorithm) => {
     ) {
       let neighbor = grid[newX][newY];
 
+      //checks if the neighbor isnt already in the closed set
       if (!includes(closedSet, neighbor)) {
         let temp_g = currentNode.g_score + 1;
 
+        //checks if the neighbor is in the open set
         if (includes(openSet, neighbor)) {
           if (temp_g < neighbor.g_score) {
+            //if the current g score is less then the
+            //the neigbhor's g score, then let the neighbor g score
+            //equal to the current g score
             neighbor.g_score = temp_g;
             betterPath = true;
           }
@@ -124,8 +140,11 @@ const graphPath = (grid, openSet, closedSet, algorithm) => {
           betterPath = true;
         }
 
+        //if the neighbor in the open set has a lower g score
         if (betterPath) {
           if (algorithm === "A* Algorithm") {
+            //h score is the huerisitic of the A* algorithm
+            //the hueristic in this case is the euclidean distance
             neighbor.h_score = euclideanDistance(
               neighbor.position[0],
               neighbor.position[1],
@@ -135,6 +154,7 @@ const graphPath = (grid, openSet, closedSet, algorithm) => {
             neighbor.f_score = neighbor.h_score + neighbor.g_score;
             neighbor.prevNode = currentNode.position;
           } else if (algorithm === "Dijkstra's Algorithm") {
+            //allows the node to keep track from where theyw came from
             neighbor.prevNode = currentNode.position;
           }
         }

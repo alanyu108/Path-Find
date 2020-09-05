@@ -1,11 +1,16 @@
 import React, { useState, useCallback, useContext } from "react";
-import { GridContext } from "./GridContext.js";
+import { GridContext } from "../GridContext.js";
 
+//displays the grid that the user interacts with
 const Display = () => {
-  const { gridValue } = useContext(GridContext);
+  const { gridValue, runningValue } = useContext(GridContext);
   const [grid, setGrid] = gridValue;
+  const [running, setRunning] = runningValue;
+
   const [mouseDown, setMouseDown] = useState(false);
 
+  //changes the color of the cell in the grid depending
+  //on which function the cell serves
   const findColor = useCallback((col) => {
     let { isStart, isEnd, isPath, isWall, inClosedSet, inOpenSet } = col;
 
@@ -27,6 +32,8 @@ const Display = () => {
     return background;
   }, []);
 
+  //handles the selection of the start and end node for
+  //the algorithms
   const handleOnClick = useCallback(
     (position) => {
       let limit = [false, false];
@@ -64,15 +71,15 @@ const Display = () => {
     setMouseDown(false);
   }, []);
 
+  //allows the user to drag and create walls if their
+  //mouse button is down
   const handleMouseMove = useCallback(
     ({ position }) => {
       if (mouseDown) {
         const newGrid = grid.slice();
         const newSquare = newGrid[position[0]][position[1]];
-        if (!newGrid[position[0]][position[1]].isWall) {
+        if (!newSquare.isWall && !newSquare.isEnd && !newSquare.isSTart) {
           newSquare.isWall = true;
-          newSquare.isEnd = false;
-          newSquare.isStart = false;
           newSquare.isPath = false;
           newSquare.inOpenSet = false;
           newSquare.inClosedSet = false;
@@ -84,7 +91,12 @@ const Display = () => {
   );
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(30, 20px)" }}>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${grid.length}, 20px)`,
+      }}
+    >
       {grid.map((rows, i) =>
         rows.map((col, k) => (
           <div
@@ -94,7 +106,9 @@ const Display = () => {
             onMouseUp={handleMouseUp}
             onMouseDown={handleMouseDown}
             onMouseMove={() => {
-              handleMouseMove(col);
+              if (!running) {
+                handleMouseMove(col);
+              }
             }}
             key={`${i}-${k}`}
             style={{
