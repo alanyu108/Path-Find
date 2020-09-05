@@ -8,13 +8,16 @@ function App(props) {
   return (
     <>
       <GridProvider>
-        Algorithms here:
-        <Select
-          options={[
-            { key: "o1", value: "Dijkstra's Algorithm" },
-            { key: "o2", value: "A* Algorithm" },
-          ]}
-        />
+        <div className={"top"}>
+          Algorithms here:
+          <Select
+            options={[
+              { key: "o1", value: "Dijkstra's Algorithm" },
+              { key: "o2", value: "A* Algorithm" },
+            ]}
+          />
+        </div>
+
         <Display />
       </GridProvider>
     </>

@@ -3,6 +3,7 @@ import { GridContext } from "../GridContext.js";
 import AStarText from "./AStarText";
 import DijkstraText from "./DijkstraText";
 import Graph from "./Graph";
+import "./Display.css";
 
 //displays the grid that the user interacts with
 const Display = () => {
@@ -53,16 +54,17 @@ const Display = () => {
       //only a start node and end node are allowed to be created
       const newGrid = grid.slice();
       const newSquare = newGrid[position[0]][position[1]];
-      if (!limit[0] || !limit[1]) {
-        if (!limit[0]) {
-          newSquare.isStart = true;
+      if (!newSquare.isWall) {
+        if (!limit[0] || !limit[1]) {
+          if (!limit[0]) {
+            newSquare.isStart = true;
+          }
+          if (!limit[1]) {
+            newSquare.isEnd = true;
+          }
         }
-        if (!limit[1]) {
-          newSquare.isEnd = true;
-        }
+        setGrid(newGrid);
       }
-
-      setGrid(newGrid);
     },
     [grid, setGrid]
   );
@@ -96,39 +98,46 @@ const Display = () => {
 
   return (
     <>
-      {algorithm === "A* Algorithm" && <AStarText />}
-      {algorithm === "Dijkstra's Algorithm" && <DijkstraText />}
-      <Graph />
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${grid.length}, 20px)`,
-        }}
-      >
-        {grid.map((rows, i) =>
-          rows.map((col, k) => (
-            <div
-              onClick={() => {
-                handleOnClick([i, k]);
-              }}
-              onMouseUp={handleMouseUp}
-              onMouseDown={handleMouseDown}
-              onMouseMove={() => {
-                if (!running) {
-                  handleMouseMove(col);
-                }
-              }}
-              key={`${i}-${k}`}
-              style={{
-                width: 20,
-                height: 20,
-                border: `solid 1px black`,
-                borderTop: i === 0 ? `solid 1px black` : "0",
-                backgroundColor: `${findColor(col)}`,
-              }}
-            ></div>
-          ))
-        )}
+      <div className={"display"}>
+        <div className={"text"}>
+          {algorithm === "A* Algorithm" && <AStarText />}
+          {algorithm === "Dijkstra's Algorithm" && <DijkstraText />}
+        </div>
+
+        <div>
+          <Graph />
+
+          <div
+            className={"grid"}
+            style={{
+              display: "grid",
+              gridTemplateColumns: `repeat(${grid.length}, 1.2rem)`,
+            }}
+          >
+            {grid.map((rows, i) =>
+              rows.map((col, k) => (
+                <div
+                  className={"grid-square"}
+                  onClick={() => {
+                    handleOnClick([i, k]);
+                  }}
+                  onMouseUp={handleMouseUp}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={() => {
+                    if (!running) {
+                      handleMouseMove(col);
+                    }
+                  }}
+                  key={`${i}-${k}`}
+                  style={{
+                    borderTop: i === 0 ? `solid 1px black` : "0",
+                    backgroundColor: `${findColor(col)}`,
+                  }}
+                ></div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </>
   );
