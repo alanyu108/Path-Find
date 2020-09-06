@@ -3,6 +3,7 @@ import { GridContext } from "../GridContext.js";
 import AStarText from "./AStarText";
 import DijkstraText from "./DijkstraText";
 import Graph from "./Graph";
+import Legend from "./Legend";
 import "./Display.css";
 
 //displays the grid that the user interacts with
@@ -102,9 +103,10 @@ const Display = () => {
         <div className={"text"}>
           {algorithm === "A* Algorithm" && <AStarText />}
           {algorithm === "Dijkstra's Algorithm" && <DijkstraText />}
+          <Legend />
         </div>
 
-        <div>
+        <div className={"grid_and_button"}>
           <Graph />
 
           <div

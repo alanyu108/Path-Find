@@ -9,7 +9,7 @@ function App(props) {
     <>
       <GridProvider>
         <div className={"top"}>
-          Algorithms here:
+          Select Algorithms:
           <Select
             options={[
               { key: "o1", value: "Dijkstra's Algorithm" },

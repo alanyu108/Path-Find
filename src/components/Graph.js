@@ -161,7 +161,7 @@ function Graph(props) {
             }
           }}
         >
-          {runningRef.current ? "Stop Path Finding" : "Start Finding Path"}
+          {runningRef.current ? "Stop " : "Start "}
         </button>
 
         {/* generates random walls if the user is too lazy to drag click the walls */}

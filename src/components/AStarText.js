@@ -4,37 +4,30 @@ const AStarText = () => {
   return (
     <>
       <div>
-        <div>
-          Lorem Ipsum is simply dummy text of the printing and typesetting
-          industry. Lorem Ipsum has been the industry's standard dummy text ever
-          since the 1500s, when an unknown printer took a galley of type and
-          scrambled it to make a type specimen book. It has survived not only
-          five centuries, but also the leap into electronic typesetting,
-          remaining essentially unchanged. It was popularised in the 1960s with
-          the release of Letraset sheets containing Lorem Ipsum passages, and
-          more recently with desktop publishing software like Aldus PageMaker
-          including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of
-          the printing and typesetting industry. Lorem Ipsum has been the
-          industry's standard dummy text ever since the 1500s, when an unknown
-          printer took a galley of type and scrambled it to make a type specimen
-          book. It has survived not only five centuries, but also the leap into
-          electronic typesetting, remaining essentially unchanged. It was
-          popularised in the 1960s with the release of Letraset sheets
-          containing Lorem Ipsum passages, and more recently with desktop
-          publishing software like Aldus PageMaker including versions of Lorem
-          Ipsum.
+        <h1>A* Algorithm</h1>
+
+        <div className={"astar-paragraph-1"}>
+          The A* algorithm is another path finding algorithm developed by a
+          research team at the Stanford Research Institute during the late
+          1960s. Similar to Dijsktra's algoritm, the algorithm aims to find the
+          shortest path between two given nodes. However, Dijkstra's algorithm
+          is particular ineffcient because it does not consider the position of
+          the end node. For example, if we had a start node with the end node
+          being directly to the right of the start node, the algorithm would
+          still spend as much time checking the left and the right side despite
+          the end node being on the right. A*, on the other hand, has a
+          hueristic, that is a way of making the probelm simpler.
         </div>
-        {/* mathjax */}
+
         <div>
-          Lorem Ipsum is simply dummy text of the printing and typesetting
-          industry. Lorem Ipsum has been the industry's standard dummy text ever
-          since the 1500s, when an unknown printer took a galley of type and
-          scrambled it to make a type specimen book. It has survived not only
-          five centuries, but also the leap into electronic typesetting,
-          remaining essentially unchanged. It was popularised in the 1960s with
-          the release of Letraset sheets containing Lorem Ipsum passages, and
-          more recently with desktop publishing software like Aldus PageMaker
-          including versions of Lorem Ipsum.
+          This hueristic, h-score, is the euclidean distance between a node and
+          the end node. With this, the algorithm is steered towards the end node
+          instead of mindlessly seraching in all direction like Dijksra's
+          algorithm. This hueristic is added with the g-score, used in
+          Dijkstra's algorithm, to create the f-score. The A* algorithm will
+          then look for the lowest f-score the determine the next node to move
+          to and the algorithm will finish when there are no more nodes to
+          explore or the end node has been found.
         </div>
       </div>
     </>

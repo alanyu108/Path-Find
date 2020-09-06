@@ -3,13 +3,14 @@
 }
 
 .select {
+  background-color: white;
   border: 1px solid #ececec;
   padding: 10px 20px;
   display: inline-block;
   cursor: pointer;
   position: relative;
   top: 0;
-  margin: 0;
+  margin-left: 5px;
   border-radius: 5px;
   font-size: 15px;
 }
