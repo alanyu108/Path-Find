@@ -5,9 +5,9 @@ import React, { useState } from "react";
 //other components through this grid context
 const createEmptyGrid = () => {
   let grid = [];
-  for (let i = 0; i < 21; i++) {
+  for (let i = 0; i < 27; i++) {
     let rows = [];
-    for (let j = 0; j < 21; j++) {
+    for (let j = 0; j < 27; j++) {
       rows.push({
         inOpenSet: false,
         inClosedSet: false,

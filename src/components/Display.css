@@ -16,15 +16,20 @@
   display: flex;
   flex-direction: column;
   margin: auto;
-  background: lightcyan;
+  /* background: lightcyan; */
   padding: 0.5rem;
 }
 
 .text h1 {
   padding-left: 1rem;
+  text-decoration: underline;
 }
 .text ol {
   padding-right: 1rem;
+}
+
+.text ol li {
+  padding-bottom: 0.5rem;
 }
 
 .dijkstra-paragraph-1 {
@@ -32,8 +37,21 @@
   padding-right: 1rem;
 }
 
+.astar-paragraph-1 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.astar-paragraph-2 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
 .grid_and_button {
-  background: rgba(87, 143, 161, 0.5);
+  /* background: rgba(87, 143, 161, 0.5); */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .grid {
   overflow: hidden;
@@ -46,9 +64,13 @@
 }
 
 .legend {
-  display: flex;
-  justify-content: space-evenly;
-  margin-bottom: 1rem;
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  padding-left: 1rem;
+}
+
+.legend div {
+  margin-bottom: 0.5rem;
 }
 
 @media (max-width: 1000px) {

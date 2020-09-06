@@ -103,7 +103,6 @@ const Display = () => {
         <div className={"text"}>
           {algorithm === "A* Algorithm" && <AStarText />}
           {algorithm === "Dijkstra's Algorithm" && <DijkstraText />}
-          <Legend />
         </div>
 
         <div className={"grid_and_button"}>
@@ -139,6 +138,7 @@ const Display = () => {
               ))
             )}
           </div>
+          <Legend />
         </div>
       </div>
     </>

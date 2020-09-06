@@ -31,18 +31,34 @@ const DijkstraText = () => {
         </li>
         <li>
           The open set is looped through to find the node with the smallest
-          distance.
+          g-score, that is the smallest distance from the start node.
         </li>
         <li>
-          Once that node has been selected, if the neighboring node has not been
-          visited,the distances of the neighboring nodes that are connected to
-          the selected node are updated. The distance in this case refers how
-          far the neighboring node is from the start node
+          Once that node has been selected, if the neighboring node is not in
+          the closed set and not in the open set, we add that node to the open
+          set and increase their g-score by one since all the edges has a weight
+          of one.
+          <ul>
+            <li>
+              If the neighbor is not in the closed set but is in the open set,
+              we add one to the current neighbor's g-score. Then we compare the
+              g-score of the current neighbor and the one in the open set. We
+              take the lower g-score and the current neighbor's g-score is set
+              to that value.
+            </li>
+            <li>
+              If the neighboring node is not in the closed set and not in the
+              open set, we update the neighbor's g-score by one and add it to
+              the open set
+            </li>
+          </ul>
         </li>
+
         <li>
-          If the neighboring node has been visited,they are added to the closed
-          set , which keeps track of all the nodes that have been visited.
+          The selected node is then added to the closed set and the neighbor
+          node keep track of the node they came from.
         </li>
+
         <li>
           Steps 3-5 are repeated until we have selected the end node from the
           open set or until the open set is empty which means that we have
