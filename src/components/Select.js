@@ -1,6 +1,7 @@
 import React, { useState, useContext } from "react";
 import { ReactComponent as CarrotIcon } from "../img/carrot.svg";
 import { GridContext } from "../GridContext";
+import "./css/Select.css";
 
 //each option of the dropdown menu
 function Option(props) {

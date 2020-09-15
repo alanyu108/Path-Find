@@ -1,4 +1,9 @@
+body {
+  background: rgba(91, 134, 134, 0.7);
+}
+
 .display {
+  background: lightcyan;
   display: flex;
   width: 90%;
   margin: auto;
@@ -26,6 +31,7 @@
 }
 .text ol {
   padding-right: 1rem;
+  margin-bottom: 0;
 }
 
 .text ol li {

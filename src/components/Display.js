@@ -4,7 +4,7 @@ import AStarText from "./AStarText";
 import DijkstraText from "./DijkstraText";
 import Graph from "./Graph";
 import Legend from "./Legend";
-import "./Display.css";
+import "./css/Display.css";
 
 //displays the grid that the user interacts with
 const Display = () => {

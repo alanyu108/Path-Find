@@ -1,5 +1,4 @@
 import React from "react";
-import "./App.css";
 import Select from "./components/Select";
 import { GridProvider } from "./GridContext";
 import Display from "./components/Display";
